@@ -1,5 +1,7 @@
 import sys
 
+DEBUG = False
+
 def check_int(s):
     s = ''.join(s.split())
     if s[0] in ('-', '+'):
@@ -60,13 +62,15 @@ class MemoryCmdUnit(MemoryUnit):
 class MemoryCmdStoreUnit(MemoryCmdUnit):
     def act(self, computer):
         computer._instruction_pointer += 1
-        print("Store %s to %s" % (computer._ac, self._get_real_address(computer, self._cmd)))
+        if DEBUG:
+            print("Store %s to %s" % (computer._ac, self._get_real_address(computer, self._cmd)))
         computer._memory[self._get_real_address(computer, self._cmd)].set_value(computer._ac)
 
 
 class MemoryCmdAddUnit(MemoryCmdUnit):
     def act(self, computer):
-        print("ADD: %s" % computer._memory[self._get_real_address(computer, self._cmd)].get_value())
+        if DEBUG:
+            print("ADD: %s, ac now = %s" % (computer._memory[self._get_real_address(computer, self._cmd)].get_value(), computer._ac))
         computer._instruction_pointer += 1
         computer._ac += computer._memory[self._get_real_address(computer, self._cmd)].get_value()
 
@@ -101,7 +105,8 @@ class MemoryCmdOperateUnit(MemoryCmdUnit):
     def act(self, computer):
         computer._instruction_pointer += 1
         val = self._get_from_source(computer)
-        print("%s VAL %s" % (self._source, val))
+        if DEBUG:
+            print("%s VAL %s cmd = %s" % (self._source, val, self._operation))
 
         if self._operation == 'COPY':
             pass
@@ -208,8 +213,14 @@ class Computer(object):
         else:
             print('HALT %s' % self._result)
 
+progname = None
+if len(sys.argv) == 2:
+    progname = sys.argv[1]
+elif len(sys.argv) == 3:
+    if sys.argv[1] == '-debug':
+        DEBUG = True
+    progname = sys.argv[2]
 
-progname = sys.argv[1]
 computer = Computer(progname)
 input_line = []
 first = True
