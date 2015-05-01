@@ -99,6 +99,7 @@ class MemoryCmdOperateUnit(MemoryCmdUnit):
     def act(self, computer):
         computer._instruction_pointer += 1
         val = self._get_from_source(computer)
+        print("%s VAL %s" % (self._source, val))
 
         if self._operation == 'COPY':
             pass
