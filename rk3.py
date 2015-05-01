@@ -42,6 +42,7 @@ class MemoryCmdUnit(MemoryUnit):
         for i, unit in enumerate(computer._memory):
             if unit.is_this_label(address):
                 return i
+        print("Label %s in unknown" % address)
     
     def get_unit_type(self):
         return 'cmd'
@@ -80,10 +81,10 @@ class MemoryCmdOperateUnit(MemoryCmdUnit):
             return computer._ac
         elif self._source == 'READ':
             return computer.read_word()
-        elif self._source == 'EOF'
+        elif self._source == 'EOF':
             if computer.is_eof():
                 return -1
-            else
+            else:
                 return 0
 
     def act(self, computer):
@@ -181,7 +182,6 @@ class Computer(object):
 
     def tick(self):
         self._memory[self._instruction_pointer].act(self)
-        print(self._ac)
 
     def set_input_line(self, input_line):
         self._input_line = input_line
@@ -193,7 +193,7 @@ first = True
 for line in fileinput.input():
     line.strip(' \r\n\t')
     if not line.strip()[0].isdigit():
-        computer.reset()
+        computer = Computer('tx0r.tx0r')
         if not first:
             computer.set_input_line(input_line)
             while computer.is_working():

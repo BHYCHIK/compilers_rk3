@@ -1,13 +1,13 @@
         OPERATE AC,CLEAR,AC// sum = 0
-        STORE SUM
+        STORE sum
 loop:          OPERATE READ,COPY,AC // dataum = READ
         STORE datum
         OPERATE EOF,COPY,AC
         TRANSFER end_loop
         OPERATE AC,CLEAR,AC
         ADD datum
-        ADD SUM
-        STORE SUM
+        ADD sum
+        STORE sum
         OPERATE AC,CLEAR,AC
         ADD minus_one
         TRANSFER loop
