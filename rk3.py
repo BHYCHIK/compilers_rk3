@@ -1,5 +1,7 @@
-import fileinput
+import sys
+
 def check_int(s):
+    s = ''.join(s.split())
     if s[0] in ('-', '+'):
         return s[1:].isdigit()
     return s.isdigit()
@@ -200,13 +202,14 @@ class Computer(object):
             print('HALT %s' % self._result)
 
 
-computer = Computer('tx0r.tx0r')
+progname = sys.argv[1]
+computer = Computer(progname)
 input_line = []
 first = True
-for line in fileinput.input():
-    line.strip(' \r\n\t')
-    if not check_int(line.strip()[0]):
-        computer = Computer('tx0r.tx0r')
+for line in sys.stdin:
+    line = line.strip(' \n\t\r')
+    if not check_int(line.strip()):
+        computer = Computer(progname)
         if not first:
             computer.set_input_line(input_line)
             while computer.is_working():
@@ -214,9 +217,9 @@ for line in fileinput.input():
             computer.report()
         first = False
         input_line = []
+        print(line)
         continue
     else:
-        print(line)
         input_line.append(int(line))
 computer.set_input_line(input_line)
 while computer.is_working():

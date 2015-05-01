@@ -1,7 +1,0 @@
-ADD one
-ADD three
-STORE three
-TRANSFER 0
-one:    WORD    1
-two:  WORD    2
-three: WORD 0

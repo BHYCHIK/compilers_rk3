@@ -1,19 +1,13 @@
-        OPERATE AC,CLEAR,AC// sum = 0
-        STORE sum
-loop:   OPERATE READ,COPY,AC // dataum = READ
-        STORE datum
+        OPERATE AC,CLEAR,AC
+        STORE minimum
+        STORE maximum
+        OPERATE READ,COPY,AC
+        STORE data
         OPERATE EOF,COPY,AC
-        TRANSFER end_loop
-        OPERATE AC,CLEAR,AC
-        ADD datum
-        ADD sum
-        STORE sum
-        OPERATE AC,CLEAR,AC
-        ADD minus_one
-        TRANSFER loop
-end_loop:   OPERATE AC,CLEAR,AC
-        ADD sum
-        OPERATE AC,COPY,HALT
-sum:    WORD    0
-datum:  WORD    0
-minus_one: WORD -1
+        TRANSFER empty
+empty:  OPERATE AC,COPY,ERROR
+
+min:    WORD 0
+max:    WORD 0
+data:   WORD 0
+any:    WORD -1
