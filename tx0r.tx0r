@@ -1,6 +1,6 @@
         OPERATE AC,CLEAR,AC// sum = 0
         STORE sum
-loop:          OPERATE READ,COPY,AC // dataum = READ
+loop:   OPERATE READ,COPY,AC // dataum = READ
         STORE datum
         OPERATE EOF,COPY,AC
         TRANSFER end_loop
@@ -16,4 +16,4 @@ end_loop:   OPERATE AC,CLEAR,AC
         OPERATE AC,COPY,HALT
 sum:    WORD    0
 datum:  WORD    0
-minus_one: WORD 0
+minus_one: WORD -1

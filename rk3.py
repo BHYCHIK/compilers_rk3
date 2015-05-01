@@ -1,4 +1,8 @@
 import fileinput
+def check_int(s):
+    if s[0] in ('-', '+'):
+        return s[1:].isdigit()
+    return s.isdigit()
 
 class MemoryUnit(object):
     def __init__(self, label):
@@ -20,13 +24,13 @@ class MemoryDataUnit(MemoryUnit):
     def __init__(self, label, value):
         super(MemoryDataUnit, self).__init__(label)
         self._value = value
-    
+
     def get_unit_type(self):
         return 'data'
 
     def get_value(self):
         return self._value
-    
+
     def set_value(self, value):
         self._value = value
 
@@ -43,7 +47,7 @@ class MemoryCmdUnit(MemoryUnit):
             if unit.is_this_label(address):
                 return i
         print("Label %s in unknown" % address)
-    
+
     def get_unit_type(self):
         return 'cmd'
 
@@ -65,9 +69,12 @@ class MemoryCmdAddUnit(MemoryCmdUnit):
 
 class MemoryCmdTransferUnit(MemoryCmdUnit):
     def act(self, computer):
-        computer._instruction_pointer = self._get_real_address(computer, self._cmd)
+        if computer._ac < 0:
+            computer._instruction_pointer = self._get_real_address(computer, self._cmd)
+        else:
+            computer._instruction_pointer += 1
 
- 
+
 class MemoryCmdOperateUnit(MemoryCmdUnit):
     def __init__(self, label, value):
         super(MemoryCmdOperateUnit, self).__init__(label, value)
@@ -90,14 +97,14 @@ class MemoryCmdOperateUnit(MemoryCmdUnit):
     def act(self, computer):
         computer._instruction_pointer += 1
         val = self._get_from_source(computer)
-        
+
         if self._operation == 'COPY':
             pass
         elif self._operation == 'CLEAR':
             val = 0
         elif self._operation == 'NEGATE':
             val = -val
-        
+
         if self._destination == 'AC':
             computer._ac = val
         elif self._destination == 'HALT':
@@ -149,22 +156,22 @@ class Computer(object):
         if line_args[0].endswith(':'):
             label = line_args[0][:-1]
             line_args = line_args[1:]
-        
+
         if line_args[0] == 'WORD':
             return MemoryDataUnit(label, int(line_args[1]))
 
         if line_args[0] == 'STORE':
             return MemoryCmdStoreUnit(label, line_args[1])
-        
+
         if line_args[0] == 'ADD':
             return MemoryCmdAddUnit(label, line_args[1])
-        
+
         if line_args[0] == 'TRANSFER':
             return MemoryCmdTransferUnit(label, line_args[1])
-        
+
         if line_args[0] == 'OPERATE':
             return MemoryCmdOperateUnit(label, line_args[1])
-    
+
 
     def _read_program(self, program_code):
         with open(program_code, 'r') as f:
@@ -186,23 +193,32 @@ class Computer(object):
     def set_input_line(self, input_line):
         self._input_line = input_line
 
+    def report(self):
+        if self._error:
+            print('ERROR')
+        else:
+            print('HALT %s' % self._result)
+
 
 computer = Computer('tx0r.tx0r')
 input_line = []
 first = True
 for line in fileinput.input():
     line.strip(' \r\n\t')
-    if not line.strip()[0].isdigit():
+    if not check_int(line.strip()[0]):
         computer = Computer('tx0r.tx0r')
         if not first:
             computer.set_input_line(input_line)
             while computer.is_working():
                 computer.tick()
+            computer.report()
         first = False
         input_line = []
         continue
     else:
+        print(line)
         input_line.append(int(line))
 computer.set_input_line(input_line)
 while computer.is_working():
     computer.tick()
+computer.report()
