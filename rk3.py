@@ -221,6 +221,7 @@ for line in sys.stdin:
         continue
     else:
         input_line.append(int(line))
+computer = Computer(progname)
 computer.set_input_line(input_line)
 while computer.is_working():
     computer.tick()
