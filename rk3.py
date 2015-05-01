@@ -154,6 +154,8 @@ class Computer(object):
 
     def _interprete_line(self, line):
         line_args = line.split()
+        if len(line_args) == 0:
+            return None
         label = None
         if line_args[0].endswith(':'):
             label = line_args[0][:-1]
@@ -182,7 +184,9 @@ class Computer(object):
                 if comment_start >= 0:
                     line = line[:comment_start]
                 line = ' '.join(line.split())
-                self._memory.append(self._interprete_line(line))
+                unit = self._interprete_line(line)
+                if unit is not None:
+                    self._memory.append(unit)
 
 
     def __init__(self, program_code):

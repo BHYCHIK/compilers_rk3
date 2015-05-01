@@ -1,13 +1,46 @@
         OPERATE AC,CLEAR,AC
-        STORE minimum
-        STORE maximum
         OPERATE READ,COPY,AC
+        STORE min
+        STORE max
+        OPERATE EOF,COPY,AC
+        TRANSFER empty          //IF no data - error
+
+loop:   OPERATE READ,COPY,AC
         STORE data
         OPERATE EOF,COPY,AC
-        TRANSFER empty
+        TRANSFER end
+        
+        OPERATE AC,CLEAR,AC
+        ADD data
+        OPERATE AC,NEGATE,AC
+        ADD max
+        TRANSFER ch_max
+        
+        OPERATE AC,CLEAR,AC
+        ADD min
+        OPERATE AC,NEGATE,AC
+        ADD data
+        TRANSFER ch_min
+
+        OPERATE AC,CLEAR,AC
+        ADD minus_one
+        TRANSFER loop
+
+ch_max: OPERATE AC,CLEAR,AC
+        ADD data
+        STORE max
+
+ch_min: OPERATE AC,CLEAR,AC
+        ADD data
+        STORE min
+
+end:    OPERATE AC,CLEAR,AC
+        ADD min
+        OPERATE AC,CLEAR,HALT
+        
 empty:  OPERATE AC,COPY,ERROR
 
 min:    WORD 0
 max:    WORD 0
 data:   WORD 0
-any:    WORD -1
+minus_one:  WORD -1
