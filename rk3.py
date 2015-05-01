@@ -1,3 +1,5 @@
+import fileinput
+
 class MemoryUnit(object):
     def __init__(self, label):
         self._label = label
@@ -64,12 +66,81 @@ class MemoryCmdTransferUnit(MemoryCmdUnit):
     def act(self, computer):
         computer._instruction_pointer = self._get_real_address(computer, self._cmd)
 
+ 
+class MemoryCmdOperateUnit(MemoryCmdUnit):
+    def __init__(self, label, value):
+        super(MemoryCmdOperateUnit, self).__init__(label, value)
+        operands = value.split(',')
+        self._source = operands[0]
+        self._operation = operands[1]
+        self._destination = operands[2]
+
+    def _get_from_source(self, computer):
+        if self._source == 'AC':
+            return computer._ac
+        elif self._source == 'READ':
+            return computer.read_word()
+        elif self._source == 'EOF'
+            if computer.is_eof():
+                return -1
+            else
+                return 0
+
+    def act(self, computer):
+        computer._instruction_pointer += 1
+        val = self._get_from_source(computer)
+        
+        if self._operation == 'COPY':
+            pass
+        elif self._operation == 'CLEAR':
+            val = 0
+        elif self._operation == 'NEGATE':
+            val = -val
+        
+        if self._destination == 'AC':
+            computer._ac = val
+        elif self._destination == 'HALT':
+            computer.halt(val)
+        elif self._destination == 'ERROR':
+            computer.error(val)
+
 
 class Computer(object):
     def reset(self):
         self._instruction_pointer = 0
         self._memory = []
         self._ac = 0
+        self._result = None
+        self._error = False
+        self._input_line = []
+        self._eof = False
+
+    def is_eof(self):
+        return self._eof
+
+    def halt(self, val):
+        self._result = val
+
+    def error(self, val):
+        self._result = val
+        self._error = True
+
+    def read_word(self):
+        if len(self._input_line) > 0:
+            res = self._input_line[0]
+            self._input_line = self._input_line[1:]
+            return res
+        else:
+            self._eof = True
+            return 0
+
+    def is_working(self):
+        if self._result is not None:
+            return False
+        if self._error:
+            return False
+        return True
+
 
     def _interprete_line(self, line):
         line_args = line.split()
@@ -89,6 +160,9 @@ class Computer(object):
         
         if line_args[0] == 'TRANSFER':
             return MemoryCmdTransferUnit(label, line_args[1])
+        
+        if line_args[0] == 'OPERATE':
+            return MemoryCmdOperateUnit(label, line_args[1])
     
 
     def _read_program(self, program_code):
@@ -109,5 +183,26 @@ class Computer(object):
         self._memory[self._instruction_pointer].act(self)
         print(self._ac)
 
+    def set_input_line(self, input_line):
+        self._input_line = input_line
+
 
 computer = Computer('tx0r.tx0r')
+input_line = []
+first = True
+for line in fileinput.input():
+    line.strip(' \r\n\t')
+    if not line.strip()[0].isdigit():
+        computer.reset()
+        if not first:
+            computer.set_input_line(input_line)
+            while computer.is_working():
+                computer.tick()
+        first = False
+        input_line = []
+        continue
+    else:
+        input_line.append(int(line))
+computer.set_input_line(input_line)
+while computer.is_working():
+    computer.tick()
