@@ -29,14 +29,22 @@ loop:   OPERATE READ,COPY,AC
 ch_max: OPERATE AC,CLEAR,AC
         ADD data
         STORE max
+        OPERATE AC,CLEAR,AC
+        ADD minus_one
+        TRANSFER loop
 
 ch_min: OPERATE AC,CLEAR,AC
         ADD data
         STORE min
+        OPERATE AC,CLEAR,AC
+        ADD minus_one
+        TRANSFER loop
 
 end:    OPERATE AC,CLEAR,AC
         ADD min
-        OPERATE AC,CLEAR,HALT
+        OPERATE AC,NEGATE,AC
+        ADD max
+        OPERATE AC,COPY,HALT
         
 empty:  OPERATE AC,COPY,ERROR
 

@@ -60,11 +60,13 @@ class MemoryCmdUnit(MemoryUnit):
 class MemoryCmdStoreUnit(MemoryCmdUnit):
     def act(self, computer):
         computer._instruction_pointer += 1
+        print("Store %s to %s" % (computer._ac, self._get_real_address(computer, self._cmd)))
         computer._memory[self._get_real_address(computer, self._cmd)].set_value(computer._ac)
 
 
 class MemoryCmdAddUnit(MemoryCmdUnit):
     def act(self, computer):
+        print("ADD: %s" % computer._memory[self._get_real_address(computer, self._cmd)].get_value())
         computer._instruction_pointer += 1
         computer._ac += computer._memory[self._get_real_address(computer, self._cmd)].get_value()
 
